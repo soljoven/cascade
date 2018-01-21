@@ -1,8 +1,5 @@
-from pandasql import sqldf
 import pandas as pd
 import numpy as np
-from datetime import timedelta
-import time
 
 def columns_cleanup(df):
     '''
@@ -94,7 +91,7 @@ def list_columns():
                          'charges_processed','charges_without_processing','charged_total','check_total',
                          'other_charge_types_total','internal_credit_total','payments_total','refund_total',
                          'balance_due','balance_due_date','cancellation_date','referral_source_comments',
-                         'transaction_id', 'rental_rate', 'departure_date'}
+                         'transaction_id', 'departure_date'}
     columns = [c for c in columns if c not in columns_to_remove]
 
     return columns
@@ -113,24 +110,29 @@ def breakout_num_nights(df):
                 create additional row using np.vstack
             5. Update the date of the newly created row by adding a day
             6. Convert the numpy array into a pandas dataframe
-            7. Read data based on webscraping to retrieve latest list of
-               active rental properties. This list will be used to filter out
-               ones that are no longer active (on the website)
     '''
+    df['daily_rental_rate'] = df['rental_rate']
     columns = df.columns
     numpy_df = df.values
     np_df = numpy_df.copy()
 
     for i in range(len(np_df)):
-        if np_df[i][-2] > 1:
-            for j in range(np_df[i][-2] - 1):
+        if np_df[i][-4] > 1:
+            numpy_df[i][-1] = float(numpy_df[i][-3])/int(numpy_df[i][-4])
+            #First date record is already populated with arriaval_date
+            #Therefore, range is num_night value -1 in below for loop
+            for j in range(np_df[i][-4] - 1):
                 numpy_df = np.vstack((numpy_df, np_df[[i]]))
-                numpy_df[-1][-1] = np.datetime64(numpy_df[-1][-1]) + np.timedelta64(j + 1,'D')
+                #Populating individual date which the property is rented by
+                #adding one day per for loop based num_nights to the arriva_date
+                numpy_df[-1][-2] = np.datetime64(numpy_df[-1][-2]) + np.timedelta64(j + 1,'D')
+                #Populating daily rental rate by dividing rental_rate [-3] by num_nights [-4]
+                numpy_df[-1][-1] = float(numpy_df[-1][-3])/int(numpy_df[-1][-4])
 
     return_df = pd.DataFrame(numpy_df, columns=columns)
 
     #Drop unnecesary columns
-    return_df = return_df.drop(['arrival_date', 'num_nights'], axis=1)
+    return_df = return_df.drop(['arrival_date', 'num_nights', 'rental_rate'], axis=1)
 
     #Add a new column to indicate occupancy
     return_df['occupied'] = 1
@@ -140,7 +142,13 @@ def breakout_num_nights(df):
     cascade_head = pd.read_csv('data/cascade_header.csv')
     cascade_head = cascade_head.drop('Unnamed: 0', axis=1)
 
+    #These list of properties that need to be removed as they are not relevant
+    remove_list = ['Poplar River Full Home (no loft)', 'Poplar River Full Home (with Loft)',
+                   'Poplar River Master (No Loft)', 'Poplar River Master (With Loft)',
+                   'Poplar River One Bedroom' ]
+
     valid_prop = list(cascade_head.property_code.values)
+    valid_prop = sorted(list(set(valid_prop) - set(remove_list)))
     return_df = return_df[return_df['property_code'].isin(valid_prop)]
 
     return return_df
