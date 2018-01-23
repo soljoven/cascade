@@ -72,6 +72,11 @@ def merge_and_expand():
     final_df['date'] = pd.to_datetime(final_df['date'])
     #create a new column year to only contain year number
     final_df['year'] = final_df['date'].dt.year
+    #create a new coulumn to determine whether a given date is
+    #weekend or not. Weekend is defined as Fri, Sat, Sun
+    final_df['weekend'] = ((final_df['date'].dt.dayofweek) // 4 == 1).astype(float)
+
+
     #make sure that date column is of type datetime
     cascade_more['date'] = pd.to_datetime(cascade_more['date'])
 
@@ -88,4 +93,4 @@ def merge_and_expand():
     final_df.occupied = final_df.occupied.fillna(0)
     final_df.daily_rental_rate = final_df.daily_rental_rate.fillna(0)
 
-    return final_df
+    return final_df   
