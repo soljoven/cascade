@@ -37,21 +37,21 @@ def split_by_year(df, test_year=2017):
     Input
     df: dataframe to split by year
     test_year: indicates which year's worth data will be held out as test
-    Output: X and y values for either train or test.
+    Output: df_train and df_test.
     '''
-    X = df.copy()
+    df_train = df.copy()
 
-    X = X[X.year < test_year + 1]
-    y = X[X.year == test_year]
-    X = X[X.year < test_year]
+    df_temp = df_train[df_train.year < test_year + 1]
+    df_test = df_train[df_train.year == test_year]
+    df_train = df_train[df_train.year < test_year]
 
-    property_code_before_test = set(list(X.property_code.unique()))
-    property_code_test_year = set(list(y.property_code.unique()))
+    property_code_before_test = set(list(df_train.property_code.unique()))
+    property_code_test_year = set(list(df_test.property_code.unique()))
     property_code_to_remove = property_code_test_year - property_code_before_test
-    to_remove_index = y[y.property_code.isin(list(property_code_to_remove))].index
-    y.drop(to_remove_index, inplace=True)
+    to_remove_index = df_test[df_test.property_code.isin(list(property_code_to_remove))].index
+    df_test.drop(to_remove_index, inplace=True)
 
-    return X, y
+    return df_train, df_test
 
 def prepare_xy(df, year_split=False, property_code=True, test_year=2017):
     '''
@@ -70,10 +70,10 @@ def prepare_xy(df, year_split=False, property_code=True, test_year=2017):
               'min_nights']
 
     if year_split:
-        X_16, y_17 = split_by_year(df, test_year)
+        df_train, df_test = split_by_year(df, test_year)
 
-        X_train, y_train = make_xy(X_16, columns, property_code)
-        X_test, y_test = make_xy(y_17, columns, property_code)
+        X_train, y_train = make_xy(df_train, columns, property_code)
+        X_test, y_test = make_xy(df_test, columns, property_code)
 
     else:
         X, y = make_xy(df, columns, property_code)
