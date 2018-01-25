@@ -62,15 +62,21 @@ def prepare_xy(df, year_split=False, property_code=True, test_year=2017):
     while test will be 2017.
     property_code: Indicates whether property_code should be party of feature set
 
-    Output: returns X_train, X_test, y_train, y_test
+    Output: returns X_train, X_test, y_train, y_test and unique property codes
+    as in the case of preparing splits, if data is split into years, it'll need
+    unique property codes.
     '''
     columns =['property_code','property_city', 'property_zip', 'series',
               'num_guests', 'num_bedrooms', 'num_bathrooms', 'allows_pets',
               'manager_rating', 'property_rating', 'weekend', 'season',
               'min_nights']
 
+    unique_property_codes = []
+
     if year_split:
         df_train, df_test = split_by_year(df, test_year)
+
+        unique_property_codes = df_train.property_code.unique()
 
         X_train, y_train = make_xy(df_train, columns, property_code)
         X_test, y_test = make_xy(df_test, columns, property_code)
@@ -80,4 +86,4 @@ def prepare_xy(df, year_split=False, property_code=True, test_year=2017):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                             random_state=127)
 
-    return X_train, X_test, y_train, y_test
+    return X_train, X_test, y_train, y_test, unique_property_codes
