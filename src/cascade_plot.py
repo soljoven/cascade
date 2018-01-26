@@ -15,16 +15,11 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
                color='r')
     else:
         prediction_label = 'Future Prediction'
+        historic_label = 'Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
         title = 'Daily Occupancy Prediction for {}'.format(property_name)
-        ax.plot(historic.index,
-                historic,
-                ':',
-                label='Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0]),
-                color='r')
-    ax.hlines(.5,
-          historic.index[0],
-          historic.index[-1],
-          linestyles='-')
+        ax.plot(historic.index, historic, ':',label=historic_label,color='r')
+
+    ax.hlines(.5,historic.index[0],historic.index[-1],linestyles='-')
 
     if scatter:
         ax.scatter(predicted.index, predicted, label=prediction_label,
@@ -62,30 +57,31 @@ def fetch_data_for_plotting(conn, df, property_name, prob, start_date, historic=
                           from cascade_full cf1,
                                retail_calendar rc1
                          where rc1.day = cf1.day
-                           and cf1.property_code = '{}'
-                           and cf1.day >= to_date('{}', 'YYYY-MM-DD')) a,
+                           and cf1.property_code = %s
+                           and cf1.day >= to_date(%s, 'YYYY-MM-DD')) a,
                        (select rc2.month_no, rc2.week_no, rc2.day_no, avg(cf2.occupied) as occupied
                           from retail_calendar rc2,
                                cascade_full cf2
                          where rc2.day = cf2.day
-                           and cf2.property_code = '{}'
-                           and cf2.day < to_date('{}', 'YYYY-MM-DD')
+                           and cf2.property_code = %s
+                           and cf2.day < to_date(%s, 'YYYY-MM-DD')
                          group by rc2.month_no, rc2.week_no, rc2.day_no) b
                  where a.month_no = b.month_no
                    and a.week_no = b.week_no
                    and a.day_no = b.day_no
-                ;'''.format(property_name, start_date, property_name, start_date)
+                ;'''
 
         query_2 = '''
                     select count(distinct(year)) - 1 as num_years
                       from cascade_full
-                     where property_code = '{}'
-                       and day < to_date('{}', 'yyyy-mm-dd');
-                  '''.format(property_name, start_date)
+                     where property_code = %s
+                       and day < to_date(%s, 'yyyy-mm-dd');
+                  '''
 
-        historic_occupied = pd.read_sql_query(query_1, conn)
+        historic_occupied = pd.read_sql_query(query_1, conn,
+                                              params=[property_name, start_date, property_name, start_date])
         cur = conn.cursor()
-        cur.execute(query_2)
+        cur.execute(query_2, [property_name, start_date])
         num_years = cur.fetchone()
 
         conn.close()
