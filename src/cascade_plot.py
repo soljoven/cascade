@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from .cascade_model import prepare_xy
 
-def plot_predict_historic(historic, predicted, property_name, num_years, actual=False):
+def plot_predict_historic(historic, predicted, property_name, num_years, actual=False, save=False):
     fig, ax = plt.subplots(figsize=(14, 6))
 
     if actual:
@@ -33,6 +33,8 @@ def plot_predict_historic(historic, predicted, property_name, num_years, actual=
     ax.set_title(title)
     plt.legend(loc="upper left")
     plt.tight_layout()
+    if save:
+        plt.savefig('{}.png'.format(property_name.replace(" ", "")))
 
 def fetch_data_for_plotting(conn, df, property_name, prob, start_date, historic=True):
 
