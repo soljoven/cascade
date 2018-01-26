@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from .cascade_model import prepare_xy
 
-def plot_predic(historic, predicted, property_name, num_years, actual=False, save=False):
+def plot_predict(historic, predicted, property_name, num_years, actual=False, save=False):
     fig, ax = plt.subplots(figsize=(14, 6))
 
     if actual:
