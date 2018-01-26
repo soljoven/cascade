@@ -12,10 +12,6 @@ def plot_predict_historic(historic, predicted, property_name, num_years, actual=
                historic,
                label='Actual Occupancy (Not to Scale)',
                color='r')
-        ax.hlines(.5,
-                  historic.index[0],
-                  historic.index[-1],
-                  linestyles='--')
     else:
         prediction_label = 'Future Prediction'
         title = 'Daily Occupancy Prediction for {}'.format(property_name)
