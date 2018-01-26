@@ -1,7 +1,16 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import psycopg2
+import os
 from .cascade_model import prepare_xy
+
+
+dbname = os.environ['CASCADE_DB_DBNAME']
+host = os.environ['CASCADE_DB_HOST']
+username = os.environ['CASCADE_DB_USERNAME']
+password = os.environ['CASCADE_DB_PASSWORD']
+port = 5432
 
 def plot_predict(historic, predicted, property_name, num_years, actual=False, scatter=False, save=False):
     fig, ax = plt.subplots(figsize=(14, 6))
@@ -42,7 +51,11 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
     if save:
         plt.savefig('{}.png'.format(property_name.replace(" ", "")))
 
-def fetch_data_for_plotting(conn, df, property_name, prob, start_date, historic=True):
+def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
+    conn = psycopg2.connect(dbname=dbname,
+                        user=username, password=password,
+                        host=host,
+                        port=port)
 
     num_years = 0
 
