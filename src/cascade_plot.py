@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from .cascade_model import prepare_xy
 
-def plot_predict(historic, predicted, property_name, num_years, actual=False, save=False):
+def plot_predict(historic, predicted, property_name, num_years, actual=False, scatter=False, save=False):
     fig, ax = plt.subplots(figsize=(14, 6))
 
     if actual:
@@ -25,11 +25,17 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sa
           historic.index[0],
           historic.index[-1],
           linestyles='-')
-    ax.plot(predicted.index,
-            predicted, label=prediction_label, color='b', alpha=.5)
+
+    if scatter:
+        ax.scatter(predicted.index, predicted, label=prediction_label,
+                   color='b', alpha=.5, marker='.')
+    else:
+        ax.plot(predicted.index,
+                predicted, label=prediction_label, color='b', alpha=.5)
+
     ax.set_xlabel('Date')
     ax.set_ylabel('Probability of Occupancy')
-    ax.set_ylim(top=1.2)
+    # ax.set_ylim(top=1.2)
     ax.set_title(title)
     plt.legend(loc="upper left")
     plt.tight_layout()
