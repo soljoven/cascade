@@ -27,11 +27,11 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         historic_label = 'Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
         title = 'Daily Occupancy Prediction for {}'.format(property_name)
 
-        if scatter:
-            ax.scatter(historic.index, historic, label=historic_label,
-                       color='r', marker='.')
-        else:
-            ax.plot(historic.index, historic, ':',label=historic_label,color='r')
+        # if scatter:
+        #     ax.scatter(historic.index, historic, label=historic_label,
+        #                color='r', marker='.')
+        # else:
+        ax.plot(historic.index, historic, ':',label=historic_label,color='r')
 
     ax.hlines(.5,historic.index[0],historic.index[-1],linestyles='-')
 
@@ -49,7 +49,7 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
     plt.legend(loc="upper left")
     plt.tight_layout()
     if save:
-        plt.savefig('{}.png'.format(property_name.replace(" ", "")))
+        plt.savefig('00{}.png'.format(property_name.replace(" ", "")))
 
 def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
     conn = psycopg2.connect(dbname=dbname,
