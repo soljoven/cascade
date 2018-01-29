@@ -123,6 +123,7 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
                  where a.month_no = b.month_no
                    and a.week_no = b.week_no
                    and a.day_no = b.day_no
+                   limit 366
                 ;'''
 
         query_2 = '''
