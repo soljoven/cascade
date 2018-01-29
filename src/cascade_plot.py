@@ -13,9 +13,29 @@ password = os.environ['CASCADE_DB_PASSWORD']
 port = 5432
 
 def plot_predict(historic, predicted, property_name, num_years, actual=False, scatter=False, save=False):
+    '''
+    Inputs
+    historic: pandas timeseries for historic rental occupancy normized by years
+    that can be compard to predicted by using retail calendar. So it's not a
+    day to day comparison but rather dates equivalent to a given predicted date over
+    the years.
+    predicted: one year worth of timeseriese for a given property (or aggregate of
+    all properties under management)
+    property_name: name of given property or all properties. To be used in labels
+    num_years: Indicates how many years worth of data is included in the historic
+    DataFrame
+    actual: indicates whether historic dataframe contain just actual when assessing
+    supervised learning (where y_actual values are available)
+    scatter: This will plot predicted as scatter while plotting historic as lines
+    save: Indicates whether plots need to be saved as .png files for future
+    analysis.
+    '''
+
     fig, ax = plt.subplots(figsize=(14, 6))
 
     if actual:
+        # For supervised learning, can compare actual days when the property was
+        # occupied by creating a red dot for indication.
         prediction_label = 'Prediction'
         title = 'Actual vs. Predicted Daily Occupancy for {}'.format(property_name)
         ax.bar(historic.index,
@@ -52,6 +72,22 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         plt.savefig('00{}.png'.format(property_name.replace(" ", "")))
 
 def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
+    '''
+    Inputs
+    df: full data set that's reflective of data in cascade_full table.
+    property_name: name of the property that needs historic rental data
+    prob: once the model has been fitted, result of model.predict_proba
+    start_date: this is the date that the model was last fitted. Query will
+    retrieve historic data corresponding to the future year using retail calendar
+    historic: indicates whether the historic information needs to be returned
+    using database query/fetch
+
+    Output
+    y_series: To be used by timeseries plot
+    predicted_occupied: prediction that corresond to y_series(timeseries)
+    num_years: if it's historic, indicates how many years of historical information
+    is included in y_series.
+    '''
     conn = psycopg2.connect(dbname=dbname,
                         user=username, password=password,
                         host=host,
