@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 def make_xy(df, columns, property_code=True):
     '''
@@ -51,7 +52,7 @@ def split_by_year(df, test_year=2017):
     to_remove_index = df_test[df_test.property_code.isin(list(property_code_to_remove))].index
     df_test.drop(to_remove_index, inplace=True)
 
-    return df_train, df_test
+    return df_train, df_test, property_code_to_remove
 
 def prepare_xy(df, year_split=False, property_code=True, test_year=2017):
     '''
@@ -71,17 +72,17 @@ def prepare_xy(df, year_split=False, property_code=True, test_year=2017):
               'manager_rating', 'property_rating', 'weekend', 'season',
               'min_nights']
 
-    unique_property_codes = []
+    df_train, df_test, property_code_to_remove = split_by_year(df, test_year)
+
+    unique_property_codes = df_train.property_code.unique()
 
     if year_split:
-        df_train, df_test = split_by_year(df, test_year)
-
-        unique_property_codes = df_train.property_code.unique()
-
         X_train, y_train = make_xy(df_train, columns, property_code)
         X_test, y_test = make_xy(df_test, columns, property_code)
 
     else:
+        to_remove_index = df[df.property_code.isin(list(property_code_to_remove))].index
+        df.drop(to_remove_index, inplace=True)
         X, y = make_xy(df, columns, property_code)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                             random_state=127)
