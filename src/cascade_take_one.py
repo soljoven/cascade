@@ -79,12 +79,12 @@ def main():
                  'num_bedrooms', 'num_bathrooms', 'allows_pets', 'property_rating',
                  'manager_rating', 'weekend', 'season', 'min_nights']
 
-    # GBC = GradientBoostingClassifier(learning_rate=.05,
-    #                                  n_estimators=1000,
-    #                                  max_depth=10,
-    #                                  subsample=1,
-    #                                  max_features='sqrt',
-    #                                  random_state=1)
+    GBC = GradientBoostingClassifier(learning_rate=.05,
+                                     n_estimators=1000,
+                                     max_depth=10,
+                                     subsample=1,
+                                     max_features='sqrt',
+                                     random_state=1)
 
     lr = LogisticRegression()
 
@@ -96,7 +96,7 @@ def main():
 
         X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, prop, dummy)
 
-        model_fit(lr, X_train, X_test, y_train, y_test, engine, feature)
+        model_fit(GBC, X_train, X_test, y_train, y_test, engine, feature)
 
 if __name__ == '__main__':
     main()
