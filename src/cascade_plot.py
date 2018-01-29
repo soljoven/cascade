@@ -95,7 +95,7 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
 
     num_years = 0
 
-    X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(df, True)
+    X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(df, [], [], True)
 
     result_df = df[['property_code', 'day']].loc[X_test.index]
     result_df['prob_0'] = prob[:,0]
