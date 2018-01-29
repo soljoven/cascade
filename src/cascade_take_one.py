@@ -40,7 +40,7 @@ def model_fit(model, X_train, X_test, y_train, y_test, engine, feature_name, cv_
     cv_score = cross_val_score(model, X_train, y_train, cv=cv_folds, scoring='roc_auc')
 
     result = [(feature_name,
-               log_loss(y_test, predictions),
+               log_loss(y_test, prob),
                accuracy_score(y_test, predictions),
                roc_auc_score(y_test, prob),
                np.mean(cv_score),
