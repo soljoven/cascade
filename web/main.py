@@ -8,12 +8,11 @@ from bokeh.layouts import row, column
 from bokeh.models import ColumnDataSource, DataRange1d, Select
 from bokeh.palettes import Blues4
 from bokeh.plotting import figure
+import pickle
 
 sys.path.append("/Users/youngsun/galvanize/dsi/capstone/cascade/src/")
-from .cascade_plot import fetch_data_for_plotting
-from .cascade_model import prepare_xy
-
-
+from cascade_model import prepare_xy
+from cascade_plot import fetch_data_for_plotting
 
 dbname = os.environ['CASCADE_DB_DBNAME']
 host = os.environ['CASCADE_DB_HOST']
@@ -77,11 +76,11 @@ X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True
 
 prop = 'Aspenwood 6540'
 
-prop_select = Select(value=prop, title='Property Code', options=list(unique_prop_codes))
+prop_select = Select(value=prop, title='Property Code', options=sorted(list(unique_prop_codes)))
 
 start_date = str(X.day.loc[X_test.index].iloc[0])
 
-with open('~/galvanize/dsi/capstone/model.pkl', 'rb') as f:
+with open('/Users/youngsun/galvanize/dsi/capstone/model.pkl', 'rb') as f:
     GBC_model = pickle.load(f)
 
 gbc_predict = GBC_model.predict_proba(X_test)

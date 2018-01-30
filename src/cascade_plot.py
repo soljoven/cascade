@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import psycopg2
 import os
-from .cascade_model import prepare_xy
+from cascade_model import prepare_xy
 
 
 dbname = os.environ['CASCADE_DB_DBNAME']
