@@ -20,22 +20,36 @@ username = os.environ['CASCADE_DB_USERNAME']
 password = os.environ['CASCADE_DB_PASSWORD']
 port = 5432
 
-def make_plot(y_series, predicted, property_name, num_years):
+def get_dataset(X, prop, gbc_predict):
+    start_date = str(X.day.loc[X_test.index].iloc[0])
+    y_series, predicted, num_years = fetch_data_for_plotting(X,
+                                                             prop,
+                                                             gbc_predict,
+                                                             start_date,
+                                                             True)
+
+    joined = pd.merge(y_series, predicted, left_index=True, right_index=True)
+
+    return ColumnDataSource(data=joined), num_years
+
+def make_plot(source, property_name, num_years):
     p = figure(tools="pan,box_zoom,reset,save",
                width=800, x_axis_type="datetime",
                x_axis_label='Date',
-               y_axis_label='Predicted Occupancy Rate')
+               y_axis_label='Predicted Daily Occupancy Rate')
 
     historic_label = 'Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
     title = 'Actual vs. Predicted Daily Occupancy for {}'.format(property_name)
 
-    p.line(y_series.index,
-           y_series.values.flatten(),
+    p.line('day',
+           'occupied',
            color='red',
            alpha=0.7,
            line_dash='dashed',
-           legend=historic_label)
-    p.line(predicted.index,predicted.values.flatten(),color='blue',legend='Future Prediction')
+           legend=historic_label,
+           source=source)
+
+    p.line('day', 'prob_1',color='blue',legend='Future Prediction', source=source)
 
     p.title.text = title
     p.legend.location = "top_left"
@@ -47,16 +61,13 @@ def make_plot(y_series, predicted, property_name, num_years):
 
     return p
 
-def update_plot(X, gbc_predict, start_date):
+def update_plot():
     prop = prop_select.value
-    p.title.text = 'Actual vs. Predicted Daily Occupancy % for {}'.format(property_name)
-
-    y_series, predicted, num_years = fetch_data_for_plotting(X,
-                                                             prop,
-                                                             gbc_predict,
-                                                             start_date,
-                                                             True)
-    return y_series, predicted, num_years
+    p.title.text = 'Actual vs. Predicted Daily Occupancy % for {}'.format(prop)
+    src, num_years = get_dataset(X, prop, gbc_predict)
+    print('after get_dataset')
+    source.data.update(src.data)
+    print('after source.data.update')
 
 
 conn = psycopg2.connect(dbname=dbname,
@@ -71,13 +82,13 @@ query = '''
 cascade = pd.read_sql_query(query, conn)
 conn.close()
 
+# cascade = pd.read_csv('/Users/youngsun/galvanize/dsi/capstone/cascade/web/cascade.csv', index_col=0)
+# print(cascade.shape)
+
 X = cascade.copy()
 X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True)
 
 prop = 'Aspenwood 6540'
-
-prop_select = Select(value=prop, title='Property Code', options=sorted(list(unique_prop_codes)))
-
 start_date = str(X.day.loc[X_test.index].iloc[0])
 
 with open('/Users/youngsun/galvanize/dsi/capstone/model.pkl', 'rb') as f:
@@ -85,19 +96,15 @@ with open('/Users/youngsun/galvanize/dsi/capstone/model.pkl', 'rb') as f:
 
 gbc_predict = GBC_model.predict_proba(X_test)
 
-y_series, predicted, num_years = fetch_data_for_plotting(X,
-                                                         prop,
-                                                         gbc_predict,
-                                                         start_date,
-                                                         True)
+prop_select = Select(value=prop, title='Property Code', options=sorted(list(unique_prop_codes)))
 
+source, num_years = get_dataset(X, prop, gbc_predict)
+p = make_plot(source, prop, num_years)
 
-plot = make_plot(y_series, predicted, prop, num_years)
-
-prop_select.on_change('value', update_plot)
+prop_select.on_change('value', lambda attr, old, new: update_plot())
 
 controls = column(prop_select)
 
-curdoc().add_root(row(plot, controls))
+curdoc().add_root(row(p, controls))
 curdoc().title = 'Actual vs. Predicted Daily Occupancy for {}'.format(prop)
 curdoc()
