@@ -60,14 +60,14 @@ def make_plot(source, property_name, num_years):
            source=source)
 
     p.title.text = title
-    p.legend.location = "top_left"
     p.title.text_font_size = '34pt'
+    p.legend.location = "top_left"
     p.ygrid.band_fill_alpha = 0.2
-    p.themed_values()
     p.grid.grid_line_alpha = .3
     p.axis.axis_label_text_font_style = "bold"
     p.x_range = DataRange1d(range_padding=0.0)
     p.add_layout(BoxAnnotation(bottom=.6, fill_alpha=0.1, fill_color='blue'))
+    p.themed_values()
 
     return p
 
@@ -83,18 +83,20 @@ conn = psycopg2.connect(dbname=dbname,
                         host=host,
                         port=port)
 
-query = '''
-        select * from cascade_full
-        ;'''
+query = '''select * from cascade_full'''
 
 cascade = pd.read_sql_query(query, conn)
 conn.close()
 
-# cascade = pd.read_csv('/Users/youngsun/galvanize/dsi/capstone/cascade/web/cascade.csv', index_col=0)
+# cascade = pd.read_csv(home_path + '/cascade.csv', index_col=0)
 # print(cascade.shape)
+# print(cascade.head())
+# print(cascade.info())
 
 X = cascade.copy()
+# print(X.shape)
 X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True)
+# print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
 prop = 'Aspenwood 6540'
 start_date = str(X.day.loc[X_test.index].iloc[0])
