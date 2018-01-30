@@ -6,6 +6,7 @@ import psycopg2
 from bokeh.io import curdoc
 from bokeh.layouts import row, column
 from bokeh.models import ColumnDataSource, DataRange1d, Select
+from bokeh.models import BoxAnnotation
 from bokeh.palettes import Blues4
 from bokeh.plotting import figure
 import pickle
@@ -44,14 +45,15 @@ def make_plot(source, property_name, num_years):
     p.line('day',
            'occupied',
            color='red',
-           alpha=0.7,
-           line_dash='dashed',
+           alpha=0.4,
+           # line_dash='dashed',
            legend='Historic Actual of Daily Average Occupancy Rate',
            source=source)
 
-    p.line('day',
+    p.circle('day',
            'prob_1',
-           color='blue',
+           size=3, color='blue', alpha=0.7,
+           # color='blue',
            legend='Prediction of Future Daily Occupancy',
            source=source)
 
@@ -63,6 +65,7 @@ def make_plot(source, property_name, num_years):
     p.grid.grid_line_alpha = .3
     p.axis.axis_label_text_font_style = "bold"
     p.x_range = DataRange1d(range_padding=0.0)
+    p.add_layout(BoxAnnotation(bottom=.6, fill_alpha=0.1, fill_color='blue'))
 
     return p
 
