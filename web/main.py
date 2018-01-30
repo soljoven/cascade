@@ -11,9 +11,9 @@ from bokeh.palettes import Blues4
 from bokeh.plotting import figure
 import pickle
 
-src_path = os.environ['CASCADE_SRC']
+home_path = os.environ['CASCADE_HOME']
 
-sys.path.append(src_path)
+sys.path.append(home_path + 'cascade/src')
 from cascade_model import prepare_xy
 from cascade_plot import fetch_data_for_plotting
 
@@ -99,7 +99,7 @@ X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True
 prop = 'Aspenwood 6540'
 start_date = str(X.day.loc[X_test.index].iloc[0])
 
-with open('/Users/youngsun/galvanize/dsi/capstone/model.pkl', 'rb') as f:
+with open(home_path+'/model.pkl', 'rb') as f:
     GBC_model = pickle.load(f)
 
 gbc_predict = GBC_model.predict_proba(X_test)
