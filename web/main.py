@@ -33,26 +33,31 @@ def get_dataset(X, prop, gbc_predict):
     return ColumnDataSource(data=joined), num_years
 
 def make_plot(source, property_name, num_years):
-    p = figure(tools="pan,box_zoom,reset,save",
-               width=800, x_axis_type="datetime",
+    p = figure(toolbar_location=None,
+               width=800,
+               x_axis_type="datetime",
                x_axis_label='Date',
                y_axis_label='Predicted Daily Occupancy Rate')
 
-    historic_label = 'Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
-    title = 'Actual vs. Predicted Daily Occupancy for {}'.format(property_name)
+    title = 'Predicted Daily Occupancy For:'
 
     p.line('day',
            'occupied',
            color='red',
            alpha=0.7,
            line_dash='dashed',
-           legend=historic_label,
+           legend='Historic Actual of Daily Average Occupancy Rate',
            source=source)
 
-    p.line('day', 'prob_1',color='blue',legend='Future Prediction', source=source)
+    p.line('day',
+           'prob_1',
+           color='blue',
+           legend='Prediction of Future Daily Occupancy',
+           source=source)
 
     p.title.text = title
     p.legend.location = "top_left"
+    p.title.text_font_size = '34pt'
     p.ygrid.band_fill_alpha = 0.2
     p.themed_values()
     p.grid.grid_line_alpha = .3
@@ -63,11 +68,9 @@ def make_plot(source, property_name, num_years):
 
 def update_plot():
     prop = prop_select.value
-    p.title.text = 'Actual vs. Predicted Daily Occupancy % for {}'.format(prop)
+    p.title.text = 'Predicted Daily Occupancy For:'
     src, num_years = get_dataset(X, prop, gbc_predict)
-    print('after get_dataset')
     source.data.update(src.data)
-    print('after source.data.update')
 
 
 conn = psycopg2.connect(dbname=dbname,
@@ -106,5 +109,5 @@ prop_select.on_change('value', lambda attr, old, new: update_plot())
 controls = column(prop_select)
 
 curdoc().add_root(row(p, controls))
-curdoc().title = 'Actual vs. Predicted Daily Occupancy for {}'.format(prop)
+curdoc().title = 'Historic Actual vs. Predicted Daily Occupancy for Cascade Rental Properties'
 curdoc()
