@@ -11,7 +11,9 @@ from bokeh.palettes import Blues4
 from bokeh.plotting import figure
 import pickle
 
-sys.path.append("/Users/youngsun/galvanize/dsi/capstone/cascade/src/")
+src_path = os.environ['CASCADE_SRC']
+
+sys.path.append(src_path)
 from cascade_model import prepare_xy
 from cascade_plot import fetch_data_for_plotting
 
