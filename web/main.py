@@ -15,7 +15,7 @@ home_path = os.environ['CASCADE_HOME']
 
 sys.path.append(home_path + 'cascade/src')
 from cascade_model import prepare_xy
-from cascade_plot import fetch_data_for_plotting
+from cascade_plot import fetch_data_for_plotting, web_prop_list
 
 dbname = os.environ['CASCADE_DB_DBNAME']
 host = os.environ['CASCADE_DB_HOST']
@@ -32,6 +32,7 @@ def get_dataset(X, prop, gbc_predict):
                                                              True)
 
     joined = pd.merge(y_series, predicted, left_index=True, right_index=True)
+    joined.columns = ['occupied', 'prob_1']
 
     return ColumnDataSource(data=joined), num_years
 
@@ -98,7 +99,7 @@ X = cascade.copy()
 X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True)
 # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
-prop = 'Aspenwood 6540'
+prop = 'All Properties'
 start_date = str(X.day.loc[X_test.index].iloc[0])
 
 with open(home_path+'/model.pkl', 'rb') as f:
@@ -106,7 +107,7 @@ with open(home_path+'/model.pkl', 'rb') as f:
 
 gbc_predict = GBC_model.predict_proba(X_test)
 
-prop_select = Select(value=prop, title='Property Code', options=sorted(list(unique_prop_codes)))
+prop_select = Select(value=prop, title='Property Code', options=web_prop_list())
 
 source, num_years = get_dataset(X, prop, gbc_predict)
 p = make_plot(source, prop, num_years)

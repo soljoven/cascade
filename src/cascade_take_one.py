@@ -6,8 +6,12 @@ from sklearn.metrics import *
 import numpy as np
 import pandas as pd
 import os
+import sys
 import psycopg2
 from sqlalchemy import create_engine
+
+home_path = os.environ['CASCADE_HOME']
+sys.path.append(home_path + 'cascade/src')
 
 from cascade_sql import *
 from cascade_model import *
