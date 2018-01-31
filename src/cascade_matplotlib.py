@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use("agg")
 import matplotlib.pyplot as plt
 import psycopg2
 import os
@@ -12,7 +14,7 @@ username = os.environ['CASCADE_DB_USERNAME']
 password = os.environ['CASCADE_DB_PASSWORD']
 port = 5432
 
-def plot_predict(historic, predicted, property_name, num_years, actual=False, scatter=False, save=False):
+def plot_predict(historic, predicted, property_name, num_years, actual=False, scatter=False, web=False, save=False):
     '''
     Inputs
     historic: pandas timeseries for historic rental occupancy normized by years
@@ -70,3 +72,6 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
     plt.tight_layout()
     if save:
         plt.savefig('00{}.png'.format(property_name.replace(" ", "")))
+
+    if web:
+        return plt
