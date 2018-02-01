@@ -66,7 +66,7 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
         result_df['prob_0'] = prob[:,0]
         result_df['prob_1'] = prob[:,1]
         predicted_occupied = result_df[result_df['property_code'] == property_name]
-        predicted_occupied.index = predicted_occupied['day']
+        predicted_occupied.index = pd.to_datetime(predicted_occupied['day'])
         predicted_occupied = predicted_occupied.drop(['day','property_code', 'prob_0'], axis=1)
 
     if historic:

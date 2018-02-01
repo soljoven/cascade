@@ -35,6 +35,16 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
 
     fig, ax = plt.subplots(figsize=(14, 6))
 
+    prediction_label = 'Future Prediction'
+    title = 'Daily Occupancy Prediction for {}'.format(property_name)
+
+    if scatter:
+        ax.scatter(predicted.index, predicted, label=prediction_label,
+                   color='b', alpha=.5, marker='.')
+    else:
+        ax.plot(predicted.index,
+                predicted, label=prediction_label, color='b', alpha=.5)
+
     if actual:
         # For supervised learning, can compare actual days when the property was
         # occupied by creating a red dot for indication.
@@ -45,10 +55,7 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
                label='Actual Occupancy (Not to Scale)',
                color='r')
     else: #For historic plots
-        prediction_label = 'Future Prediction'
         historic_label = 'Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
-        title = 'Daily Occupancy Prediction for {}'.format(property_name)
-
         # if scatter:
         #     ax.scatter(historic.index, historic, label=historic_label,
         #                color='r', marker='.')
@@ -56,13 +63,6 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         ax.plot(historic.index, historic, ':',label=historic_label,color='r')
 
     ax.hlines(.5,historic.index[0],historic.index[-1],linestyles='-')
-
-    if scatter:
-        ax.scatter(predicted.index, predicted, label=prediction_label,
-                   color='b', alpha=.5, marker='.')
-    else:
-        ax.plot(predicted.index,
-                predicted, label=prediction_label, color='b', alpha=.5)
 
     ax.set_xlabel('Date', size=15)
     ax.set_ylabel('Probability of Occupancy', size=15)
