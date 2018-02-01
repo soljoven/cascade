@@ -64,10 +64,14 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         ax.plot(predicted.index,
                 predicted, label=prediction_label, color='b', alpha=.5)
 
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Probability of Occupancy')
+    ax.set_xlabel('Date', size=15)
+    ax.set_ylabel('Probability of Occupancy', size=15)
+    for xtick in ax.xaxis.get_major_ticks():
+        xtick.label.set_fontsize(15)
+    for ytick in ax.yaxis.get_major_ticks():
+        ytick.label.set_fontsize(15)
     # ax.set_ylim(top=1.2)
-    ax.set_title(title)
+    ax.set_title(title, size=20)
     plt.legend(loc="upper left")
     plt.tight_layout()
     if save:
