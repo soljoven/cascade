@@ -1,4 +1,16 @@
 import pandas as pd
+import os
+import sys
+from sqlalchemy import create_engine
+home_path = os.environ['CASCADE_HOME']
+sys.path.append(home_path + 'cascade/src')
+from cascade_sql import write_to_table
+
+dbname = os.environ['CASCADE_DB_DBNAME']
+host = os.environ['CASCADE_DB_HOST']
+username = os.environ['CASCADE_DB_USERNAME']
+password = os.environ['CASCADE_DB_PASSWORD']
+port = 5432
 
 def merge_and_expand():
     '''
@@ -13,7 +25,7 @@ def merge_and_expand():
     '''
 
     #retrieving file that contains historic occupancy info
-    cascade_more = pd.read_csv('data/cascade_more.csv',
+    cascade_more = pd.read_csv(home_path + 'data/cascade_more.csv',
                                infer_datetime_format=True, index_col=0)
 
     #processing file that contains property features
@@ -23,7 +35,9 @@ def merge_and_expand():
                    'Poplar River Master (No Loft)', 'Poplar River Master (With Loft)',
                    'Poplar River One Bedroom' ]
 
-    cascade_details = pd.read_csv('data/prop_head.csv', index_col=0)
+    # This is a file that was scraped from the reservation website
+    # It contains property attribute information
+    cascade_details = pd.read_csv(home_path + 'data/prop_head.csv', index_col=0)
     #records pertaining to remove_list are removed from dataframe
     cascade_details = cascade_details[~cascade_details['property_code'].isin(remove_list)]
 
@@ -72,6 +86,7 @@ def merge_and_expand():
     final_df['date'] = pd.to_datetime(final_df['date'])
     #create a new column year to only contain year number
     final_df['year'] = final_df['date'].dt.year
+    final_df['month'] = final_df['date'].dt.month
     #create a new coulumn to determine whether a given date is
     #weekend or not. Weekend is defined as Fri, Sat, Sun
     final_df['weekend'] = ((final_df['date'].dt.dayofweek) // 4 == 1).astype(float)
@@ -93,4 +108,26 @@ def merge_and_expand():
     final_df.occupied = final_df.occupied.fillna(0)
     final_df.daily_rental_rate = final_df.daily_rental_rate.fillna(0)
 
-    return final_df   
+    final_df.series = final_df.series.fillna('Moderate')
+    final_df.property_zip = final_df.property_zip.fillna(55615.0)
+    hovland_index = final_df[final_df['property_code'] == 'Hovland Pines'].index
+    final_df.loc[hovland_index, ['property_city']] = 'Hovland'
+
+    bluefin_index = final_df[final_df['property_code'].isin(['Bluefin Bay 14 Full Home', 'Bluefin Bay 14A', 'Bluefin Bay 14B',
+       'Bluefin Bay 56 Full Home', 'Bluefin Bay 56A', 'Bluefin Bay 56B',
+       'Bluefin Bay 57 Full Home', 'Bluefin Bay 57A', 'Bluefin Bay 57B'])].index
+    final_df.loc[bluefin_index, ['property_city']] = 'Tofte'
+
+    return final_df
+
+def main():
+    df = merge_and_expand()
+    # df.to_csv(home_path+ 'data/cascade_expanded.csv')
+
+    address = 'postgresql://{}:{}@{}:{}/{}'.format(username, password, host, port, dbname)
+    engine = create_engine(address)
+
+    write_to_table(df, engine, 'cascade_hist', if_exists='replace')
+
+if __name__ == '__main__':
+    main()
