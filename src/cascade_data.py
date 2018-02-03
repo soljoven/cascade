@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import os
+home_path = os.environ['CASCADE_HOME']
 
 def columns_cleanup(df):
     '''
@@ -35,10 +37,10 @@ def read_csv(year, columns):
 
     '''
     year = int(year)
-    if year == 17:
-        df = pd.read_csv('./data/{}salescycle.csv'.format(year), encoding='latin-1')
+    if year in (17, 18):
+        df = pd.read_csv(home_path + 'data/{}salescycle.csv'.format(year), encoding='latin-1')
     else:
-        df = pd.read_csv('./data/{}salescycle.csv'.format(year))
+        df = pd.read_csv(home_path + 'data/{}salescycle.csv'.format(year))
 
     df = columns_cleanup(df)
 
@@ -79,7 +81,7 @@ def list_columns():
     dropped from the final column list
     '''
 
-    columns = list(columns_cleanup(pd.read_csv('./data/17salescycle.csv', encoding='latin-1')).columns)
+    columns = list(columns_cleanup(pd.read_csv(home_path + 'data/17salescycle.csv', encoding='latin-1')).columns)
     columns_to_remove = {'property_address','property_country', 'property_state', 'property_country',
                          'reservation_type','location_id','agent','company_name','first_name',
                          'last_name','phone','cell_phone','email','address','city','state','zip',
@@ -91,7 +93,7 @@ def list_columns():
                          'charges_processed','charges_without_processing','charged_total','check_total',
                          'other_charge_types_total','internal_credit_total','payments_total','refund_total',
                          'balance_due','balance_due_date','cancellation_date','referral_source_comments',
-                         'transaction_id', 'departure_date'}
+                         'transaction_id', 'departure_date', 'transaction_notes'}
     columns = [c for c in columns if c not in columns_to_remove]
 
     return columns
@@ -139,7 +141,11 @@ def breakout_num_nights(df):
 
     return_df['date'] = pd.to_datetime(return_df['date'], format="%m/%d/%Y", errors='ignore')
 
-    cascade_head = pd.read_csv('data/cascade_header.csv')
+    # cascade_header is a file that contains name of property_code and
+    # its corresponding url for detail scraping.
+    # Using it here to get the name of valid property code and remove
+    # historic ones that are no longer managed by the company
+    cascade_head = pd.read_csv(home_path + 'data/cascade_header.csv')
     cascade_head = cascade_head.drop('Unnamed: 0', axis=1)
 
     #These list of properties that need to be removed as they are not relevant
@@ -152,3 +158,12 @@ def breakout_num_nights(df):
     return_df = return_df[return_df['property_code'].isin(valid_prop)]
 
     return return_df
+
+def main():
+    years = ['12', '13', '14', '15', '16', '17', '18']
+    df = one_df(years, list_columns())
+    print(len(df))
+    breakout_num_nights(df).to_csv(home_path + 'data/cascade_more.csv')
+
+if __name__ == '__main__':
+    main()
