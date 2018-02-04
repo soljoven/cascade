@@ -14,7 +14,7 @@ import pickle
 home_path = os.environ['CASCADE_HOME']
 
 sys.path.append(home_path + 'cascade/src')
-from cascade_model import prepare_xy
+from cascade_model import prepare_xy, make_xy
 from cascade_plot import fetch_data_for_plotting, web_prop_list
 
 dbname = os.environ['CASCADE_DB_DBNAME']
@@ -84,7 +84,7 @@ conn = psycopg2.connect(dbname=dbname,
                         host=host,
                         port=port)
 
-query = '''select * from cascade_full'''
+query = '''select * from cascade_test'''
 
 cascade = pd.read_sql_query(query, conn)
 conn.close()
@@ -96,13 +96,14 @@ conn.close()
 
 X = cascade.copy()
 # print(X.shape)
-X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True)
+# X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True)
 # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+X_test, y_test = make_xy(X, [], [])
 
 prop = 'All Properties'
-start_date = str(X.day.loc[X_test.index].iloc[0])
+start_date = str(cascade.day[0])
 
-with open(home_path+'/model.pkl', 'rb') as f:
+with open(home_path+'GBC_model_1801.pkl', 'rb') as f:
     GBC_model = pickle.load(f)
 
 gbc_predict = GBC_model.predict_proba(X_test)
