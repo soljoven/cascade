@@ -62,7 +62,7 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         # else:
         ax.plot(historic.index, historic, ':',label=historic_label,color='r')
 
-    ax.hlines(.5,historic.index[0],historic.index[-1],linestyles='-')
+    ax.hlines(.5,predicted.index[0],predicted.index[-1],linestyles='-')
 
     ax.set_xlabel('Date', size=15)
     ax.set_ylabel('Probability of Occupancy', size=15)
