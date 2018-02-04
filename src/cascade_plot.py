@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 
 home_path = os.environ['CASCADE_HOME']
 sys.path.append(home_path + 'cascade/src')
-from cascade_model import prepare_xy
+from cascade_model import prepare_xy, make_xy
 from cascade_sql import write_to_table
 
 dbname = os.environ['CASCADE_DB_DBNAME']
@@ -40,18 +40,21 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
 
     num_years = 0
 
-    X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(df, [], [], True)
+    # X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(df, [], [], True)
+    result_df = df.copy()
+    result_df = result_df[['property_code', 'day']]
+    result_df['prob_0'] = prob[:,0]
+    result_df['prob_1'] = prob[:,1]
+
     if property_name == 'All Properties':
-        X_test_pred = df.loc[X_test.index]
-        X_test_pred['proba'] = prob[:,1]
 
         address = 'postgresql://{}:{}@{}:{}/{}'.format(username, password, host, port, dbname)
         engine = create_engine(address)
 
-        write_to_table(X_test_pred, engine, 'test_prob', 'replace')
+        write_to_table(result_df, engine, 'test_prob', 'replace')
 
         query = '''
-                select day, avg(proba)
+                select day, avg(prob_1)
                   from test_prob
                  group by day
                  order by 1
@@ -59,28 +62,25 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
 
         proba = pd.read_sql_query(query, conn)
 
-        proba.index = proba['day']
+        proba.index = pd.to_datetime(proba['day'])
         predicted_occupied = proba.drop('day', axis=1)
     else:
-        result_df = df[['property_code', 'day']].loc[X_test.index]
-        result_df['prob_0'] = prob[:,0]
-        result_df['prob_1'] = prob[:,1]
         predicted_occupied = result_df[result_df['property_code'] == property_name]
         predicted_occupied.index = pd.to_datetime(predicted_occupied['day'])
         predicted_occupied = predicted_occupied.drop(['day','property_code', 'prob_0'], axis=1)
 
     if historic:
-        query_1 = '''
+        individual_prop = '''
                 select a.day, b.occupied
                   from (select cf1.day, rc1.month_no, rc1.week_no, rc1.day_no
-                          from cascade_full cf1,
+                          from cascade_test cf1,
                                retail_calendar rc1
                          where rc1.day = cf1.day
                            and cf1.property_code = %s
                            and cf1.day >= to_date(%s, 'YYYY-MM-DD')) a,
                        (select rc2.month_no, rc2.week_no, rc2.day_no, avg(cf2.occupied) as occupied
                           from retail_calendar rc2,
-                               cascade_full cf2
+                               cascade_hist cf2
                          where rc2.day = cf2.day
                            and cf2.property_code = %s
                            and cf2.day < to_date(%s, 'YYYY-MM-DD')
@@ -91,16 +91,17 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
                    limit 366
                 ;'''
 
-        query_2 = '''
+        all_properties = '''
                 select a.day, avg(b.occupied)
-                  from (select cf1.day, rc1.month_no, rc1.week_no, rc1.day_no
-                          from cascade_full cf1,
+                  from (select cf1.day, rc1.month_no, rc1.week_no, rc1.day_no, count(*)
+                          from cascade_test cf1,
                                retail_calendar rc1
                          where rc1.day = cf1.day
-                           and cf1.day >= to_date(%s, 'YYYY-MM-DD')) a,
+                           and cf1.day >= to_date(%s, 'YYYY-MM-DD')
+                         group by cf1.day, rc1.month_no, rc1.week_no, rc1.day_no) a,
                        (select rc2.month_no, rc2.week_no, rc2.day_no, avg(cf2.occupied) as occupied
                           from retail_calendar rc2,
-                               cascade_full cf2
+                               cascade_hist cf2
                          where rc2.day = cf2.day
                            and cf2.day < to_date(%s, 'YYYY-MM-DD')
                          group by rc2.month_no, rc2.week_no, rc2.day_no) b
@@ -118,10 +119,10 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
                        and day < to_date(%s, 'yyyy-mm-dd');
                   '''
         if property_name == 'All Properties':
-            historic_occupied = pd.read_sql_query(query_2, conn,
+            historic_occupied = pd.read_sql_query(all_properties, conn,
                                                   params=[start_date, start_date])
         else:
-            historic_occupied = pd.read_sql_query(query_1, conn,
+            historic_occupied = pd.read_sql_query(individual_prop, conn,
                                                   params=[property_name, start_date, property_name, start_date])
         cur = conn.cursor()
         cur.execute(query_num_years, [property_name, start_date])
@@ -129,7 +130,7 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
 
         conn.close()
 
-        historic_occupied.index = historic_occupied['day']
+        historic_occupied.index = pd.to_datetime(historic_occupied['day'])
         historic_occupied = historic_occupied.drop('day', axis=1)
 
         return historic_occupied, predicted_occupied, num_years
@@ -151,10 +152,9 @@ def web_prop_list():
                             port=port)
 
     query_1 = '''
-            select property_code
-              from cascade_full
-             group by property_code
-            having min(distinct(day)) + 732 < current_date
+            select distinct(property_code)
+              from cascade_test
+             order by 1
             ;'''
 
     list_prop = pd.read_sql_query(query_1, conn)

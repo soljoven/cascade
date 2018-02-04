@@ -11,6 +11,12 @@ def make_xy(df, columns, dummy):
     columns: indicates which columns need to be included in the final X dataframe
     dummy: features that need to be dummied by pandas
     '''
+    if len(columns) == 0:
+        columns =['property_code','property_city', 'property_zip', 'series',
+                  'num_guests', 'num_bedrooms', 'num_bathrooms', 'allows_pets',
+                  'manager_rating', 'property_rating', 'weekend', 'season',
+                  'min_nights']
+
     if len(dummy) == 0:
         dummy = ['property_code','property_city',
                  'property_zip', 'series',
@@ -50,7 +56,7 @@ def prepare_xy(df, columns=[], dummy=[], year_split=False, test_year=2017):
     '''
     Input
     df: dataframe to split into train and test set
-    columsn: Full list of features that are to be included in the preparation
+    columns: Full list of features that are to be included in the preparation
     dummy: list of features that need to be dummied by pandas.
     year_split: indicates whether the train/test set needs to be split along year
     In current scenario, split will be historical date between 2012 to 2016 as train
@@ -60,11 +66,6 @@ def prepare_xy(df, columns=[], dummy=[], year_split=False, test_year=2017):
     as in the case of preparing splits, if data is split into years, it'll need
     unique property codes.
     '''
-    if len(columns) == 0:
-        columns =['property_code','property_city', 'property_zip', 'series',
-                  'num_guests', 'num_bedrooms', 'num_bathrooms', 'allows_pets',
-                  'manager_rating', 'property_rating', 'weekend', 'season',
-                  'min_nights']
 
     df_train, df_test, property_code_to_remove = split_by_year(df, test_year)
 

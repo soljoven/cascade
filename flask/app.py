@@ -7,7 +7,7 @@ import pandas as pd
 home_path = os.environ['CASCADE_HOME']
 sys.path.append(home_path + 'cascade/src')
 from cascade_plot import fetch_data_for_plotting, web_prop_list
-from cascade_model import prepare_xy
+from cascade_model import prepare_xy, make_xy
 import matplotlib
 matplotlib.use("agg")
 from cascade_matplotlib import plot_predict
@@ -22,14 +22,15 @@ port = 5432
 
 app = Flask(__name__)
 
-cascade = pd.read_csv(home_path + 'cascade.csv', index_col=0)
-X = cascade.copy()
-X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True)
+cascade_test = pd.read_csv(home_path + 'data/cascade_test.csv', index_col=0)
+X = cascade_test.copy()
+# X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(X, [], [], True)
+X_test, y_test = make_xy(X, [], [])
 
 property_name = 'All Properties'
-start_date = str(X.day.loc[X_test.index].iloc[0])
+start_date = str(cascade_test.day[0])
 
-with open(home_path + 'model.pkl', 'rb') as f:
+with open(home_path + 'gbc_model_1801.pkl', 'rb') as f:
     GBC_model = pickle.load(f)
 gbc_predict = GBC_model.predict_proba(X_test)
 
@@ -41,9 +42,13 @@ def index():
 @app.route('/plot/<property_name>')
 def _plot(property_name):
 
-    y_series, predicted, num_years = fetch_data_for_plotting(X,property_name,gbc_predict,start_date,True)
+    historic, predicted, num_years = fetch_data_for_plotting(X,
+                                                             property_name,
+                                                             gbc_predict,
+                                                             start_date,
+                                                             True)
 
-    plt = plot_predict(y_series, predicted, property_name, num_years, False, True, True)
+    plt = plot_predict(historic, predicted, property_name, num_years, False, False, True)
     image = BytesIO()
     plt.savefig(image)
     return image.getvalue(), 200, {'Content-Type': 'image/png'}
