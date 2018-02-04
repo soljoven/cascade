@@ -118,6 +118,9 @@ def merge_and_expand():
        'Bluefin Bay 57 Full Home', 'Bluefin Bay 57A', 'Bluefin Bay 57B'])].index
     final_df.loc[bluefin_index, ['property_city']] = 'Tofte'
 
+    final_df['day'] = pd.to_datetime(final_df['date'])
+    final_df.drop('date', axis=1)
+
     return final_df
 
 def main():
