@@ -99,7 +99,7 @@ def merge_and_expand():
     #merge final datafram with cascade_more so that daily_rental_rate
     #and occupied can be added accurately to the final dataframe
     final_df = pd.merge(final_df,
-                        cascade_more[['property_code', 'date',
+                        cascade_more[['property_code', 'date', 'reservation_type',
                                       'daily_rental_rate', 'occupied']],
                         how='left',
                         on=['property_code','date'])

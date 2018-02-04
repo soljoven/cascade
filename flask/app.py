@@ -30,7 +30,7 @@ X_test, y_test = make_xy(X, [], [])
 property_name = 'All Properties'
 start_date = str(cascade_test.day[0])
 
-with open(home_path + 'GBC_model_1801.pkl', 'rb') as f:
+with open(home_path + 'GBC_model_1802.pkl', 'rb') as f:
     GBC_model = pickle.load(f)
 gbc_predict = GBC_model.predict_proba(X_test)
 

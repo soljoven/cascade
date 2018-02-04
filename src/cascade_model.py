@@ -67,17 +67,17 @@ def prepare_xy(df, columns=[], dummy=[], year_split=False, test_year=2017):
     unique property codes.
     '''
 
-    df_train, df_test, property_code_to_remove = split_by_year(df, test_year)
-
-    unique_property_codes = df_train.property_code.unique()
+    unique_property_codes = []
 
     if year_split:
+        df_train, df_test, property_code_to_remove = split_by_year(df, test_year)
+        unique_property_codes = df_train.property_code.unique()
         X_train, y_train = make_xy(df_train, columns, dummy)
         X_test, y_test = make_xy(df_test, columns, dummy)
 
     else:
-        to_remove_index = df[df.property_code.isin(list(property_code_to_remove))].index
-        df.drop(to_remove_index, inplace=True)
+        # to_remove_index = df[df.property_code.isin(list(property_code_to_remove))].index
+        # df.drop(to_remove_index, inplace=True)
         X, y = make_xy(df, columns, dummy)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                             random_state=127)

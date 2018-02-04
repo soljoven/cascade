@@ -83,7 +83,7 @@ def list_columns():
 
     columns = list(columns_cleanup(pd.read_csv(home_path + 'data/17salescycle.csv', encoding='latin-1')).columns)
     columns_to_remove = {'property_address','property_country', 'property_state', 'property_country',
-                         'reservation_type','location_id','agent','company_name','first_name',
+                         'location_id','agent','company_name','first_name',
                          'last_name','phone','cell_phone','email','address','city','state','zip',
                          'process_status','transaction_status','date_booked','num_of_days_til_arrival',
                          'additional_guest_fee_rent','gross_total_rental_rate',
@@ -113,6 +113,13 @@ def breakout_num_nights(df):
             5. Update the date of the newly created row by adding a day
             6. Convert the numpy array into a pandas dataframe
     '''
+    # cascade_header is a file that contains name of property_code and
+    # its corresponding url for detail scraping.
+    # Using it here to get the name of valid property code and remove
+    # historic ones that are no longer managed by the company
+    cascade_head = pd.read_csv(home_path + 'data/cascade_header.csv')
+    cascade_head = cascade_head.drop('Unnamed: 0', axis=1)
+
     df['daily_rental_rate'] = df['rental_rate']
     columns = df.columns
     numpy_df = df.values
@@ -140,13 +147,6 @@ def breakout_num_nights(df):
     return_df['occupied'] = 1
 
     return_df['date'] = pd.to_datetime(return_df['date'], format="%m/%d/%Y", errors='ignore')
-
-    # cascade_header is a file that contains name of property_code and
-    # its corresponding url for detail scraping.
-    # Using it here to get the name of valid property code and remove
-    # historic ones that are no longer managed by the company
-    cascade_head = pd.read_csv(home_path + 'data/cascade_header.csv')
-    cascade_head = cascade_head.drop('Unnamed: 0', axis=1)
 
     #These list of properties that need to be removed as they are not relevant
     remove_list = ['Poplar River Full Home (no loft)', 'Poplar River Full Home (with Loft)',
