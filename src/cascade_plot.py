@@ -40,34 +40,17 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
 
     num_years = 0
 
-    # X_train, X_test, y_train, y_test, unique_prop_codes = prepare_xy(df, [], [], True)
     result_df = df.copy()
     result_df = result_df[['property_code', 'day']]
-    result_df['prob_0'] = prob[:,0]
-    result_df['prob_1'] = prob[:,1]
+    result_df['prob'] = prob[:,1]
 
     if property_name == 'All Properties':
-
-        address = 'postgresql://{}:{}@{}:{}/{}'.format(username, password, host, port, dbname)
-        engine = create_engine(address)
-
-        write_to_table(result_df, engine, 'test_prob', 'replace')
-
-        query = '''
-                select day, avg(prob_1)
-                  from test_prob
-                 group by day
-                 order by 1
-                ;'''
-
-        proba = pd.read_sql_query(query, conn)
-
-        proba.index = pd.to_datetime(proba['day'])
-        predicted_occupied = proba.drop('day', axis=1)
+        predicted_occupied = pd.DataFrame(result_df.groupby('day').prob.mean())
+        predicted_occupied.index = pd.to_datetime(predicted_occupied.index)
     else:
         predicted_occupied = result_df[result_df['property_code'] == property_name]
         predicted_occupied.index = pd.to_datetime(predicted_occupied['day'])
-        predicted_occupied = predicted_occupied.drop(['day','property_code', 'prob_0'], axis=1)
+        predicted_occupied = predicted_occupied.drop(['day','property_code'], axis=1)
 
     if historic:
         individual_prop = '''
