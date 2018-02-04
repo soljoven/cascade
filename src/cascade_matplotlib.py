@@ -51,8 +51,8 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         prediction_label = 'Prediction'
         title = 'Actual vs. Predicted Daily Occupancy for {}'.format(property_name)
         ax.bar(historic.index,
-               historic,
-               label='Actual Occupancy (Not to Scale)',
+               historic.values,
+               label='2017 Actual Occupancy (Not to Scale)',
                color='r')
     else: #For historic plots
         historic_label = 'Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
