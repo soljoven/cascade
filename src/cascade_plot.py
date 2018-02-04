@@ -104,12 +104,13 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, historic=True):
         if property_name == 'All Properties':
             historic_occupied = pd.read_sql_query(all_properties, conn,
                                                   params=[start_date, start_date])
+            num_years = (2,)                                
         else:
             historic_occupied = pd.read_sql_query(individual_prop, conn,
                                                   params=[property_name, start_date, property_name, start_date])
-        cur = conn.cursor()
-        cur.execute(query_num_years, [property_name, start_date])
-        num_years = cur.fetchone()
+            cur = conn.cursor()
+            cur.execute(query_num_years, [property_name, start_date])
+            num_years = cur.fetchone()
 
         conn.close()
 
@@ -134,12 +135,14 @@ def web_prop_list():
                             host=host,
                             port=port)
 
-    query_1 = '''
-            select distinct(property_code)
-              from cascade_test
-             order by 1
+    query = '''
+                select property_code
+                  from cascade_full
+                 group by property_code
+                having min(distinct(day)) + 732 < current_date
+                order by 1
             ;'''
 
-    list_prop = pd.read_sql_query(query_1, conn)
+    list_prop = pd.read_sql_query(query, conn)
 
     return list(['All Properties']) + list(list_prop.property_code)
