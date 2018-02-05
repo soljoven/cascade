@@ -16,6 +16,14 @@ username = os.environ['CASCADE_DB_USERNAME']
 password = os.environ['CASCADE_DB_PASSWORD']
 port = 5432
 
+'''
+For readability purposes, storing sql queries as grobal variables
+
+TO DO:
+There is a more efficient way to organize these
+queries that are very similar
+'''
+
 individual_prop_full_year = '''
         select a.day, b.occupied
           from (select cf1.day, rc1.month_no, rc1.week_no, rc1.day_no
@@ -114,10 +122,11 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, full_year=True)
     using database query/fetch
 
     Output
-    y_series: To be used by timeseries plot
+    y_series: To be used by timeseries plot (historic or actual)
     predicted_occupied: prediction that corresond to y_series(timeseries)
     num_years: if it's historic, indicates how many years of historical information
-    is included in y_series.
+    is included in y_series. Also it defaults to 2 yrs when using All Properties
+    option.
     '''
     conn = psycopg2.connect(dbname=dbname,
                             user=username, password=password,

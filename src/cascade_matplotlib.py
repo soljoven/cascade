@@ -30,6 +30,8 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
     actual: indicates whether historic dataframe contain just actual when assessing
     supervised learning (where y_actual values are available)
     scatter: This will plot predicted as scatter while plotting historic as lines
+    web: Indicates whether the call is intended for the website or not.
+    If it is for website, function will return a fig object.
     save: Indicates whether plots need to be saved as .png files for future
     analysis.
     '''
@@ -44,18 +46,10 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         # occupied by creating a red dot for indication.
         prediction_label = 'Prediction'
         title = 'Actual vs. Predicted Daily Occupancy for {}'.format(property_name)
-        # ax.bar(historic.index,
-        #        historic.values,
-        #        label='2017 Actual Occupancy (Not to Scale)',
-        #        color='r')
         ax.stem(historic.index, historic.values,
                 label='2017 Actual Occupancy (Not to Scale)', size=15, color='r')
     else: #For historic plots
         historic_label = 'Historic Actual with at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
-        # if scatter:
-        #     ax.scatter(historic.index, historic, label=historic_label,
-        #                color='r', marker='.')
-        # else:
         ax.plot(historic.index, historic, ':',label=historic_label,color='red')
 
     if scatter:
@@ -86,8 +80,27 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         return plt
 
 def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fig=False, shorten_historic_legend=False):
+    '''
+    This module has a very unique purpose and it is to compare 3 models
+    used in the project. It creates a matplotlib based plot comparing
+    prediction from 3 models against historic actual.
+
+    Inputs
+    df: Full year worth (12 months) of data that was used for model.predict_proba
+    property_name: Name of property under evaluation
+    gbc_prob: Probabiliyt of GBC model based on df
+    rf_prob: Probabiliyt of RF model based on df
+    lr_prob: Probabiliyt of LR model based on df
+    save_fig: Indicates whether the plot should be saved during its run
+    shorten_historic_legend: Shortens legend for historic data
+    '''
+
+    # This is set to the first(lowest) calendar day of the dataframe
     start_date = str(df.day[0])
 
+    # TO DO: Make so that a dictionary of tuples that contain
+    # prediction, unique plot features such as color and label
+    # rather than calling fetch_data_for_plotting 3 times.
     y_series_GBC, predicted_GBC, num_years_GBC = fetch_data_for_plotting(df,
                                                                  property_name,
                                                                  gbc_prob,
@@ -122,8 +135,6 @@ def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fi
             predicted_RF, label='Future Prediction with RF', alpha=.8, color='c')
     ax.plot(predicted_GBC.index,
             predicted_GBC, label='Future Prediction with GBC', alpha=.7, color='b')
-
-    # ax.hlines(.5,historic.index[0],historic.index[-1],linestyles='-')
 
     ax.set_xlabel('Date', size=15, color='k')
     ax.set_ylabel('Probability of Occupancy', size=15, color='k')

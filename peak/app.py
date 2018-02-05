@@ -36,12 +36,23 @@ gbc_predict = GBC_model.predict_proba(X_test)
 
 @app.route('/')
 def index():
+    '''
+    Retrieves the list of property list for the dropdown
+    and populate it at website load
+    '''
     prop_list = web_prop_list()
     return render_template('peak.html',prop_list=prop_list)
 
 @app.route('/plot/<property_name>')
 def _plot(property_name):
+    '''
+    Input: Property Name selected by user using the dropdown
 
+    Function calls fetch_data_for_plotting to retrieve actual
+    for last full calendar year for peak period as well as
+    prediction for the given property code and
+    returns a matplotlib figure object
+    '''
     historic, predicted, num_years = fetch_data_for_plotting(X,
                                                              property_name,
                                                              gbc_predict,

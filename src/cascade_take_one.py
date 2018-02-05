@@ -16,23 +16,51 @@ sys.path.append(home_path + 'cascade/src')
 from cascade_sql import *
 from cascade_model import *
 
+'''
+This is a very specific module that assess the performance of a model when
+one feature is removed when holding everything else constant (sort of partial
+dependence plot but with cross validation and error metrics)
+'''
+
 def remove_element(feature):
-    prop_list = ['property_code', 'property_city', 'property_zip', 'series', 'num_guests',
+    '''
+    Based on pre-defined list of features and features that need to be dummied
+    this function will remove a feature from the both the features and dummy
+    lists
+
+    Input
+    feature: feature to be removed
+
+    Output
+    feature list with the input removed and dummy_list with input removed
+    when applicable
+    '''
+    feat_list = ['property_code', 'property_city', 'property_zip', 'series', 'num_guests',
                  'num_bedrooms', 'num_bathrooms', 'allows_pets', 'property_rating',
                  'manager_rating', 'weekend', 'season', 'min_nights']
     dummy_list = ['property_code', 'property_city', 'property_zip', 'series', 'num_guests',
                  'num_bedrooms', 'num_bathrooms', 'season', 'min_nights']
 
     if feature in dummy_list:
-        prop_list.remove(feature)
+        feat_list.remove(feature)
         dummy_list.remove(feature)
 
-    if feature in prop_list:
-        prop_list.remove(feature)
+    if feature in feat_list:
+        feat_list.remove(feature)
 
-    return prop_list, dummy_list
+    return feat_list, dummy_list
 
 def model_fit(model, X_train, X_test, y_train, y_test, engine, feature_name, cv_folds=5):
+    '''
+    This is the main engine of the process.
+    It takes in the model, data and one feature name (or lack there of) and
+    cross validation folds.
+
+    It fits the model and calles both predict and predict_proba then uses them
+    for cross validation and scores them.
+
+    Once all the metrics are determined then writes them to the database.
+    '''
 
     model.fit(X_train, y_train)
 
@@ -59,6 +87,13 @@ def model_fit(model, X_train, X_test, y_train, y_test, engine, feature_name, cv_
     write_to_table(df, engine, 'take_one_results', 'append')
 
 def main():
+    '''
+    This is the main funciton that drives the process.
+    It retrieves data from CASCAD_FULL table.
+    Instantiates a model: in this case GBC, hardcoded
+    And loops through list of pre definied features and calls
+    model_fit function.
+    '''
 
     dbname = os.environ['CASCADE_DB_DBNAME']
     host = os.environ['CASCADE_DB_HOST']
@@ -79,7 +114,7 @@ def main():
     conn.close()
     X = cascade.copy()
 
-    prop_list = ['property_code', 'property_city', 'property_zip', 'series', 'num_guests',
+    feat_list = ['property_code', 'property_city', 'property_zip', 'series', 'num_guests',
                  'num_bedrooms', 'num_bathrooms', 'allows_pets', 'property_rating',
                  'manager_rating', 'weekend', 'season', 'min_nights']
 
@@ -92,7 +127,7 @@ def main():
 
     lr = LogisticRegression()
 
-    for feature in prop_list:
+    for feature in feat_list:
         address = 'postgresql://{}:{}@{}:{}/{}'.format(username, password, host, port, dbname)
         engine = create_engine(address)
 
