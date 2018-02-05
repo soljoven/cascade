@@ -1,2 +1,2 @@
-# cascade
-Forecasting property rental probability
+# Predicting Future Occupancy at Cascade Vacation Rentals
+
