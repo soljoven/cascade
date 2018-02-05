@@ -38,13 +38,6 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
     prediction_label = 'Future Prediction'
     title = 'Daily Occupancy Prediction for {}'.format(property_name)
 
-    if scatter:
-        ax.scatter(predicted.index, predicted, label=prediction_label,
-                   color='b', alpha=.5, marker='.')
-    else:
-        ax.plot(predicted.index,
-                predicted, label=prediction_label, color='b', alpha=.5)
-
     if actual:
         # For supervised learning, can compare actual days when the property was
         # occupied by creating a red dot for indication.
@@ -61,6 +54,13 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         #                color='r', marker='.')
         # else:
         ax.plot(historic.index, historic, ':',label=historic_label,color='r')
+
+    if scatter:
+        ax.scatter(predicted.index, predicted, label=prediction_label,
+                   color='b', alpha=.8, marker='.')
+    else:
+        ax.plot(predicted.index,
+                predicted, label=prediction_label, color='b', alpha=.8)
 
     ax.hlines(.5,predicted.index[0],historic.index[-1],linestyles='-')
 
@@ -126,7 +126,7 @@ def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fi
         ytick.label.set_fontsize(15)
         ytick.label.set_color('k')
     ax.set_title(title, size=20)
-    plt.legend(loc="upper left", fontsize = 'large')
+    plt.legend(loc="upper left", prop={'size':14})
     plt.tight_layout()
 
     if save_fig:
