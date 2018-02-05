@@ -81,7 +81,7 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
     if web:
         return plt
 
-def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fig=False):
+def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fig=False, shorten_historic_legend=False):
     start_date = str(df.day[0])
 
     y_series_GBC, predicted_GBC, num_years_GBC = fetch_data_for_plotting(df,
@@ -106,9 +106,12 @@ def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fi
     prediction_label = 'Future Prediction'
     title = 'Daily Occupancy Prediction for {}'.format(property_name)
 
-    historic_label = 'Historic Actual Based on {} Years of Daily Average Occupancy Rate'.format(num_years_GBC[0])
-    ax.plot(historic.index, historic, ':',label=historic_label, color='r')
+    if shorten_historic_legend:
+        historic_label = 'Historic Actual'
+    else:
+        historic_label = 'Historic Actual with {} Years of Daily Average Occupancy Rate'.format(num_years_GBC[0])
 
+    ax.plot(historic.index, historic, ':',label=historic_label, color='r')
     ax.plot(predicted_LR.index,
             predicted_LR, label='Future Prediction with LR', alpha=.6, color='k')
     ax.plot(predicted_RF.index,
