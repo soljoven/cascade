@@ -6,7 +6,8 @@ def make_xy(df, columns, dummy):
     '''
     Creates X, y split for a given dataframe and creating dummified columns for
     select categorial features (hard coded)
-    Input
+
+    Inputs
     df: dataframe to split into X, y
     columns: indicates which columns need to be included in the final X dataframe
     dummy: features that need to be dummied by pandas
@@ -33,7 +34,10 @@ def make_xy(df, columns, dummy):
 def split_by_year(df, test_year=2017):
     '''
     As the name indicates, dataframe will be split by year
-    Input
+    This module was used for model selection but for production
+    I don't foresee it being used.
+
+    Inputs
     df: dataframe to split by year
     test_year: indicates which year's worth data will be held out as test
     Output: df_train and df_test.
@@ -54,7 +58,7 @@ def split_by_year(df, test_year=2017):
 
 def prepare_xy(df, columns=[], dummy=[], year_split=False, test_year=2017):
     '''
-    Input
+    Inputs
     df: dataframe to split into train and test set
     columns: Full list of features that are to be included in the preparation
     dummy: list of features that need to be dummied by pandas.
@@ -76,8 +80,6 @@ def prepare_xy(df, columns=[], dummy=[], year_split=False, test_year=2017):
         X_test, y_test = make_xy(df_test, columns, dummy)
 
     else:
-        # to_remove_index = df[df.property_code.isin(list(property_code_to_remove))].index
-        # df.drop(to_remove_index, inplace=True)
         X, y = make_xy(df, columns, dummy)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                             random_state=127)
