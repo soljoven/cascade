@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import psycopg2
 import os
 from cascade_model import prepare_xy
+from cascade_plot import fetch_data_for_plotting
 
 
 dbname = os.environ['CASCADE_DB_DBNAME']
@@ -88,14 +89,14 @@ def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fi
                                                                  gbc_prob,
                                                                  start_date,
                                                                  True )
-    y_series_RF, predicted_RF, num_years_RF = fetch_data_for_plotting(cascade_test,
+    y_series_RF, predicted_RF, num_years_RF = fetch_data_for_plotting(df,
                                                              property_name,
-                                                             RF_prob,
+                                                             rf_prob,
                                                              start_date,
                                                              True )
-    y_series_LR, predicted_LR, num_years_LR = fetch_data_for_plotting(cascade_test,
+    y_series_LR, predicted_LR, num_years_LR = fetch_data_for_plotting(df,
                                                              property_name,
-                                                             LR_prob,
+                                                             lr_prob,
                                                              start_date,
                                                              True )
     historic = y_series_GBC
@@ -105,14 +106,14 @@ def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fi
     prediction_label = 'Future Prediction'
     title = 'Daily Occupancy Prediction for {}'.format(property_name)
 
-    historic_label = 'Historic Actual Based on {} Years of Daily Average Occupancy Rate'.format(num_years[0])
+    historic_label = 'Historic Actual Based on {} Years of Daily Average Occupancy Rate'.format(num_years_GBC[0])
     ax.plot(historic.index, historic, ':',label=historic_label, color='r')
 
     ax.plot(predicted_LR.index,
             predicted_LR, label='Future Prediction with LR', alpha=.6, color='k')
     ax.plot(predicted_RF.index,
             predicted_RF, label='Future Prediction with RF', alpha=.8, color='c')
-    ax.plot(predicted.index,
+    ax.plot(predicted_GBC.index,
             predicted_GBC, label='Future Prediction with GBC', alpha=.7, color='b')
 
     # ax.hlines(.5,historic.index[0],historic.index[-1],linestyles='-')
@@ -130,4 +131,4 @@ def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fi
     plt.tight_layout()
 
     if save_fig:
-        plt.savefig('00model_comp{}.png'.format(property_name))
+        plt.savefig('00_model_comp_{}.png'.format(property_name))
