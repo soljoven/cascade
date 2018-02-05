@@ -79,3 +79,55 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
 
     if web:
         return plt
+
+def plot_model_comparison(df, property_name, gbc_prob, rf_prob, lr_prob, save_fig=False):
+    start_date = str(df.day[0])
+
+    y_series_GBC, predicted_GBC, num_years_GBC = fetch_data_for_plotting(df,
+                                                                 property_name,
+                                                                 gbc_prob,
+                                                                 start_date,
+                                                                 True )
+    y_series_RF, predicted_RF, num_years_RF = fetch_data_for_plotting(cascade_test,
+                                                             property_name,
+                                                             RF_prob,
+                                                             start_date,
+                                                             True )
+    y_series_LR, predicted_LR, num_years_LR = fetch_data_for_plotting(cascade_test,
+                                                             property_name,
+                                                             LR_prob,
+                                                             start_date,
+                                                             True )
+    historic = y_series_GBC
+
+    fig, ax = plt.subplots(figsize=(14, 6))
+
+    prediction_label = 'Future Prediction'
+    title = 'Daily Occupancy Prediction for {}'.format(property_name)
+
+    historic_label = 'Historic Actual Based on {} Years of Daily Average Occupancy Rate'.format(num_years[0])
+    ax.plot(historic.index, historic, ':',label=historic_label, color='r')
+
+    ax.plot(predicted_LR.index,
+            predicted_LR, label='Future Prediction with LR', alpha=.6, color='k')
+    ax.plot(predicted_RF.index,
+            predicted_RF, label='Future Prediction with RF', alpha=.8, color='c')
+    ax.plot(predicted.index,
+            predicted_GBC, label='Future Prediction with GBC', alpha=.7, color='b')
+
+    # ax.hlines(.5,historic.index[0],historic.index[-1],linestyles='-')
+
+    ax.set_xlabel('Date', size=15, color='k')
+    ax.set_ylabel('Probability of Occupancy', size=15, color='k')
+    for xtick in ax.xaxis.get_major_ticks():
+        xtick.label.set_fontsize(15)
+        xtick.label.set_color('k')
+    for ytick in ax.yaxis.get_major_ticks():
+        ytick.label.set_fontsize(15)
+        ytick.label.set_color('k')
+    ax.set_title(title, size=20)
+    plt.legend(loc="upper left", fontsize = 'large')
+    plt.tight_layout()
+
+    if save_fig:
+        plt.savefig('00model_comp{}.png'.format(property_name))
