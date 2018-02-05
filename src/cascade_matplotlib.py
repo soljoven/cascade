@@ -44,17 +44,19 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         # occupied by creating a red dot for indication.
         prediction_label = 'Prediction'
         title = 'Actual vs. Predicted Daily Occupancy for {}'.format(property_name)
-        ax.bar(historic.index,
-               historic.values,
-               label='2017 Actual Occupancy (Not to Scale)',
-               color='r')
+        # ax.bar(historic.index,
+        #        historic.values,
+        #        label='2017 Actual Occupancy (Not to Scale)',
+        #        color='r')
+        ax.stem(historic.index, historic.values,
+                label='2017 Actual Occupancy (Not to Scale)', size=15, color='r')
     else: #For historic plots
-        historic_label = 'Historic Actual Based on at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
+        historic_label = 'Historic Actual with at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
         # if scatter:
         #     ax.scatter(historic.index, historic, label=historic_label,
         #                color='r', marker='.')
         # else:
-        ax.plot(historic.index, historic, ':',label=historic_label,color='r')
+        ax.plot(historic.index, historic, ':',label=historic_label,color='red')
 
     if scatter:
         ax.scatter(predicted.index, predicted, label=prediction_label,

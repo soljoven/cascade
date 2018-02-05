@@ -93,7 +93,7 @@ all_properties_peak = '''
                   from retail_calendar rc2,
                        cascade_hist cf2
                  where rc2.day = cf2.day
-                   and cf2.day < to_date('2018-02-01', 'YYYY-MM-DD')
+                   and cf2.day < to_date(%s, 'YYYY-MM-DD')
                    and cf2.year = 2017
                  group by rc2.month_no, rc2.week_no, rc2.day_no) b
          where a.month_no = b.month_no
@@ -125,6 +125,7 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, full_year=True)
                             port=port)
 
     num_years = 0
+    peak_divisor = 2.5
 
     result_df = df.copy()
     result_df = result_df[['property_code', 'day', 'month']]
@@ -138,7 +139,7 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, full_year=True)
         else:
             historic_occupied = pd.read_sql_query(all_properties_peak, conn,
                                                   params=[start_date])
-            historic_occupied.occupied = np.divide(historic_occupied.occupied, 30)
+            historic_occupied.occupied = np.divide(historic_occupied.occupied, peak_divisor)
 
             predicted_occupied = pd.DataFrame(result_df[(result_df.month.isin([6, 7, 8, 9, 10]))].groupby('day').prob.mean())
 
@@ -155,7 +156,7 @@ def fetch_data_for_plotting(df, property_name, prob, start_date, full_year=True)
         else:
             historic_occupied = pd.read_sql_query(individual_prop_peak, conn,
                                                   params=[property_name, property_name, start_date])
-            historic_occupied.occupied = np.divide(historic_occupied.occupied, 30)
+            historic_occupied.occupied = np.divide(historic_occupied.occupied, peak_divisor)
 
             predicted_occupied = result_df[(result_df.month.isin([6, 7, 8, 9, 10])) & (result_df.property_code==property_name)]
 
