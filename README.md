@@ -29,15 +29,21 @@ From ~20k records where each row contain property name, start of rental date and
 
 Postgresql database hosted in RDS was used extensively during data engineering and EDA process.
 
-As part of data preparation, to reflect the historic daily average occupancy, each calendar day was associated with month, weeek, day numbers from Retail Calendar (aka [4-5-4 calendar](https://en.wikipedia.org/wiki/4–4–5_calendar)). This way, comparison of prediction vs. historical data takes into consideration seasonality and day of the week as weekend ended up having a huge importance as a feature in the model.
+As part of data preparation, to reflect the historic daily average occupancy, each calendar day was associated with month, weeek and day number from Retail Calendar (aka [4-5-4 calendar](https://en.wikipedia.org/wiki/4–4–5_calendar)). This way, comparison of prediction vs. historical data takes into consideration seasonality and day of the week especially weekend ended up having a huge importance as a feature in the model.
 
 ## Modeling
-
-
+Once data engineering tasks were completed, following classification models were used:
+- Logistic Regression
+- Random Forest
+- Grandient Boosting Classifier
 
 ## Evaluation
+Using KFold cross-validation evaluated model performance using log-loss and AUC score to compare different models.
+It turns out that all three models were not too dissimilar even after tuning RF and GBC via extensive GridSearch.
 
 ![image ROC](/img/ROC.png)
+
+However, what tip the scale in favor of GBC can be seen below:
 
 ## Deployment
 
