@@ -1,4 +1,5 @@
 # Predicting Future Occupancy at Cascade Vacation Rentals
+![image cvr homepage](/img/cvr_homepage.png)
 
 ## Confidentiality
 As part of this consulting project, I was given access to private data from Cascad Vacation Rentals.
@@ -15,7 +16,7 @@ This is a third party vendor site that manages reservations for CVR and it is wh
 Sales reports contains, among other metrics, a record for each rental with start date as well as its duration. This is the only source of occupancy information.
 2012 was the last year of historical data retrieved from LiveRez.com
 
-#### Business Website: cascadevacationrentals.com
+#### [Business Website](http://www.cascadevacationrentals.com):
 Using Selenium, property features data was scraped from the business reservation site. 
 Information on the website is not easily obtainable via other means and there is no central location where such data is stored by the business. 
 Additionally, there is seasons (and its date range), rates and minimum numer of nights information per property that was scraped from the website.
