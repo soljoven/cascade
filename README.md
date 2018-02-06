@@ -37,4 +37,8 @@ As part of data preparation, to reflect the historic daily average occupancy, ea
 
 ## Evaluation
 
+![image ROC](/img/ROC.png)
+
 ## Deployment
+
+![image architecture and technology](/img/arch_tech.png)
