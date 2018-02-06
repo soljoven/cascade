@@ -38,7 +38,7 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
 
     fig, ax = plt.subplots(figsize=(14, 6))
 
-    prediction_label = 'Future Prediction'
+    prediction_label = 'Prediction'
     title = 'Daily Occupancy Prediction for {}'.format(property_name)
 
     if actual:
@@ -49,7 +49,7 @@ def plot_predict(historic, predicted, property_name, num_years, actual=False, sc
         ax.stem(historic.index, historic.values,
                 label='2017 Actual Occupancy (Not to Scale)', size=15, color='r')
     else: #For historic plots
-        historic_label = 'Historic Actual with at Least {} Year(s) of Daily Average Occupancy Rate'.format(num_years[0])
+        historic_label = 'Historic Daily Average with at Least {} Year(s)'.format(num_years[0])
         ax.plot(historic.index, historic, ':',label=historic_label,color='red')
 
     if scatter:
