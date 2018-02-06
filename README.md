@@ -47,8 +47,9 @@ However, what tip the scale in favor of GBC can be seen below:
 
 ![image model comp](/img/model_comp.png)
 
-When compared to historic daily average occupancy, GBC came closest when compared to other models.
+When model predictions were compared to historic daily average occupancy, GBC had the closest correlation to it.
 
 ## Deployment
-
+Final product is in the shape of a basic web app (see Confidentiality section for demo) and a dashboard for top properties with highest average prediction over the peak season. 
+Following architecture and technology were used for this project:
 ![image architecture and technology](/img/arch_tech.png)
