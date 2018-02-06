@@ -51,5 +51,6 @@ When model predictions were compared to historic daily average occupancy, GBC ha
 
 ## Deployment
 Final product is in the shape of a basic web app (see Confidentiality section for demo) and a dashboard for top properties with highest average prediction over the peak season. 
+
 Following architecture and technology were used for this project:
 ![image architecture and technology](/img/arch_tech.png)
