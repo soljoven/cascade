@@ -45,6 +45,10 @@ It turns out that all three models were not too dissimilar even after tuning RF 
 
 However, what tip the scale in favor of GBC can be seen below:
 
+![image model comp](/img/model_comp.png)
+
+When compared to historic daily average occupancy, GBC came closest when compared to other models.
+
 ## Deployment
 
 ![image architecture and technology](/img/arch_tech.png)
