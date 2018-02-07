@@ -1,4 +1,4 @@
-# Predicting Future Occupancy at Cascade Vacation Rentals
+# Predicting Occupancy at Cascade Vacation Rentals
 ![image cvr homepage](/img/cvr_homepage.png)
 
 ## Confidentiality
