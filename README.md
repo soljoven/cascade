@@ -6,7 +6,7 @@ As part of this consulting project, I was given access to private data from Casc
 If you need to access the project or the demo of web applications, please contact me at youngsun{@}gmail.com
 
 ## Business Understanding
-As a small business, Cascade Vacation Rentals (CVR) has the aspiration to use Data Science to drive their business decisions. One such candidate is the prediction of future occupancy its properties. This metric is important especially during the peak seasons as based on the probability threshold, business can decide to modify its daily rate for maximum revenue. Currently, the process to assess whether a property should change its daily rate is manual and based solely on last full calendar year's performance.
+As a small business, Cascade Vacation Rentals (CVR) has the aspiration to use Data Science to drive their business decisions. One such candidate is the prediction of future occupancy of its properties. This metric is important especially during the peak seasons as based on the probability threshold, business can decide to modify its daily rate for maximum revenue. Currently, the process to assess whether a property should change its daily rate is manual and based solely on last full calendar year's performance.
 
 ## Data Understanding
 There are two main sources of data.
