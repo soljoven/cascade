@@ -2,11 +2,11 @@
 ![image cvr homepage](/img/cvr_homepage.png)
 
 ## Confidentiality
-As part of this consulting project, I was given access to private data from Cascad Vacation Rentals.
+As part of this consulting project, I was given access to private data from Cascade Vacation Rentals.
 If you need to access the project or the demo of web applications, please contact me at youngsun{@}gmail.com
 
 ## Business Understanding
-As a small business, Cascade Vacation Rentals (CVR) has the aspiration to use Data Science to drive their business decisions. One such candadate is the prediction of future occupancy its properties. This metric is important especially during the peak seasons as based on the probability threshold, business can decide to modify its daily rate for maximum revenue. Currently, the process to assess whether a property should change its daily rate is manual and based solely on last full calendar year's performance.
+As a small business, Cascade Vacation Rentals (CVR) has the aspiration to use Data Science to drive their business decisions. One such candidate is the prediction of future occupancy its properties. This metric is important especially during the peak seasons as based on the probability threshold, business can decide to modify its daily rate for maximum revenue. Currently, the process to assess whether a property should change its daily rate is manual and based solely on last full calendar year's performance.
 
 ## Data Understanding
 There are two main sources of data.
@@ -19,7 +19,7 @@ Sales reports contains, among other metrics, a record for each rental with start
 #### [Business Website](http://www.cascadevacationrentals.com):
 Using Selenium, property features data was scraped from the business reservation site. 
 Information on the website is not easily obtainable via other means and there is no central location where such data is stored by the business. 
-Additionally, there is seasons (and its date range), rates and minimum numer of nights information per property that was scraped from the website.
+Additionally, there is seasons (and its date range), rates and minimum number of nights information per property that was scraped from the website.
 There are total of 155 properties managed by CVR as the time of this writing.
 
 ## Data Preparation
@@ -29,13 +29,13 @@ From ~20k records where each row contain property name, start of rental date and
 
 Postgresql database hosted in RDS was used extensively during data engineering and EDA process.
 
-As part of data preparation, to reflect the historic daily average occupancy, each calendar day was associated with month, weeek and day number from Retail Calendar (aka [4-5-4 calendar](https://en.wikipedia.org/wiki/4–4–5_calendar)). This way, comparison of prediction vs. historical data takes into consideration seasonality and day of the week especially weekend ended up having a huge importance as a feature in the model.
+As part of data preparation, to reflect the historic daily average occupancy, each calendar day was associated with month, week and day number from Retail Calendar (aka [4-5-4 calendar](https://en.wikipedia.org/wiki/4–4–5_calendar)). This way, comparison of prediction vs. historical data takes into consideration seasonality and day of the week especially weekend ended up having a huge importance as a feature in the model.
 
 ## Modeling
 Once data engineering tasks were completed, following classification models were used:
 - Logistic Regression
 - Random Forest
-- Grandient Boosting Classifier
+- Gradient Boosting Classifier
 
 ## Evaluation
 Using KFold cross-validation evaluated model performance using log-loss and AUC score to compare different models.
